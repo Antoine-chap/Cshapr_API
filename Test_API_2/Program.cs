@@ -95,4 +95,51 @@ app.MapDelete("/clients/{id}", (int id) =>
     return Results.Ok($"Client :{client.Name} Supprimé avec succès.");
 });
 
+//Affiche tous les tickets
+app.MapGet("/tickets", () =>
+{
+    if (tickets.Count == 0)
+    {
+        return Results.NotFound("Aucun ticket trouvé");
+    }
+
+    //var ticket = tickets.FirstOrDefault(t => t.Id == id);
+
+    //if (ticket = null)
+    //{
+    //    return Results.NotFound("Ticket non trouvé");
+    //}
+    return Results.Ok(tickets);
+});
+
+
+//Modifier un ticket par son ID
+app.MapPut("/tickets/{id}", (int id, Tickets EditTicketStatus) =>
+{
+    var ticket = tickets.FirstOrDefault(t => t.Id == id);
+    if (ticket == null)
+    {
+        return Results.NotFound("Le ticket n'existe pas");
+    }
+    ticket.Status = EditTicketStatus.Status;
+    ticket.Title = EditTicketStatus.Title;
+    ticket.Description = EditTicketStatus.Description;
+    ticket.Id_Client = ticket.Id_Client;
+
+    return Results.Ok(ticket);
+});
+
+//Supprimer un ticket
+app.MapDelete("/tickets/{id}", (int id) =>
+{
+    var ticket = tickets.FirstOrDefault(t => t.Id == id);
+    if (ticket == null)
+    {
+        return Results.NotFound("Le ticket non trouvé.");
+    }
+    tickets.Remove(ticket);
+
+    return Results.Ok($"Ticket supprimé avec succès.");
+});
+
 app.Run();
