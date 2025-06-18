@@ -1,4 +1,5 @@
 using Scalar.AspNetCore;
+using System.Net;
 using Test_API_2.Main;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -139,7 +140,57 @@ app.MapDelete("/tickets/{id}", (int id) =>
     }
     tickets.Remove(ticket);
 
-    return Results.Ok($"Ticket supprimé avec succès.");
+    return Results.Ok("Ticket supprimé avec succès.");
 });
+
+//trier tickets status
+app.MapGet("/tickets/{status})", (string status) =>
+{
+    var ticket = tickets.Where(t => t.Status == status);
+    if (ticket == null)
+    {
+        return Results.NotFound("Aucun ticket avec ce status trouvé");
+    }
+
+    return Results.Ok($"Ticket : {ticket}");
+
+});
+
+//crée un ticket lier a un client
+app.MapPost("/tickets/{id_client})", (Tickets ticketClient) =>
+{
+    ticketClient.Id = tickets.Count > 0 ? tickets.Max(t => t.Id) + 1 : 1;
+
+    ticketClient.Status = "Open";
+
+    if (string.IsNullOrEmpty(ticketClient.Title))
+    {
+        return Results.BadRequest("Le titre du ticket est obligatoire");
+    }
+
+
+    if (string.IsNullOrEmpty(ticketClient.Description))
+    {
+        return Results.BadRequest("La description du ticket est obligatoire");
+    }
+
+    tickets.Add(ticketClient);
+
+    return Results.Ok("Le ticket a bien été ajouté");
+});
+
+//Recupéré les tickets d'un client 
+app.MapGet("/tickets/{clientId}", (int clientId) =>
+{
+    var clientTickets = tickets.Where(t => t.Id_Client == clientId).ToList();
+
+    if (clientTickets.Count == 0)
+    {
+        return Results.NotFound("Aucun ticket trouvé pour ce client");
+    }
+
+    return Results.Ok(clientTickets);
+});
+
 
 app.Run();
