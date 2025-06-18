@@ -104,12 +104,6 @@ app.MapGet("/tickets", () =>
         return Results.NotFound("Aucun ticket trouvé");
     }
 
-    //var ticket = tickets.FirstOrDefault(t => t.Id == id);
-
-    //if (ticket = null)
-    //{
-    //    return Results.NotFound("Ticket non trouvé");
-    //}
     return Results.Ok(tickets);
 });
 
